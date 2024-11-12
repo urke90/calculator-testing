@@ -3,3 +3,15 @@ body {
   margin: 0;
   box-sizing: border-box;
 }
+
+.calc {
+  width: 400px;
+  margin: 100px auto;
+  border: 6px solid #3e3b3a;
+  border-radius: 4px;
+}
+
+.calc__display {
+  padding: 15px 10px;
+  background-color: #bab2af;
+}
