@@ -2,4 +2,52 @@ body {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  color: #ffffff;
+  /* font-size: px; */
+}
+
+button {
+  border: none;
+  outline: none;
+  width: 68px;
+  border: none;
+}
+
+.calc {
+  width: 300px;
+  margin: 100px auto;
+  border: 6px solid #3e3b3a;
+  border-radius: 4px;
+}
+
+.display {
+  padding: 15px 10px;
+  background-color: #575351;
+  border-bottom: 6px solid #3e3b3a;
+  font-size: 26px;
+}
+
+.keypad-wrapper {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  background-color: #67625f;
+}
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 4px;
+  border: 3px solid #3e3b3a;
+  padding: 14px 20px;
+  background-color: #4c4846;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.btn--orange {
+  background-color: #d87607;
 }
