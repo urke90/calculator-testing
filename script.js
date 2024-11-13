@@ -1,5 +1,25 @@
-console.log('running');
+class Calculator {
+  state = {
+    a: 0,
+    b: 0,
+    score: 0,
+  };
 
-const heading = document.querySelector('#calculator-heading');
+  methods = {
+    '+': (a, b) => a + b,
+    '-': (a, b) => a - b,
+    '*': (a, b) => a * b,
+    '/': (a, b) => a / b,
+    '%': (a, b) => (a / b) * 100,
+  };
 
-console.log('heading', heading);
+  operate(a, b, operator) {
+    this.state.a = a;
+    this.state.b = b;
+    this.state.score = this.methods[operator](a, b);
+  }
+}
+
+const calculator = new Calculator();
+
+calculator.operate(2, 4, '+');
