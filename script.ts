@@ -22,4 +22,10 @@ class Calculator {
 
 const calculator = new Calculator();
 
-calculator.operate(2, 4, '+');
+const calculatorContainer = document.getElementById('calculator')!;
+const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]');
+const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]');
+
+console.log('calculatorContainer', calculatorContainer);
+console.log('numberButtons', numberButtons);
+console.log('operationButtons', operationButtons);

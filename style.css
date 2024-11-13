@@ -10,7 +10,17 @@ button {
   border: none;
   outline: none;
   width: 68px;
-  border: none;
+  /* border: none; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ffffff;
+  border-radius: 4px;
+  border: 3px solid #3e3b3a;
+  padding: 14px 20px;
+  background-color: #4c4846;
+  cursor: pointer;
+  font-size: 20px;
 }
 
 .calc {
@@ -34,18 +44,6 @@ button {
   gap: 4px;
   padding: 6px;
   background-color: #67625f;
-}
-.btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #ffffff;
-  border-radius: 4px;
-  border: 3px solid #3e3b3a;
-  padding: 14px 20px;
-  background-color: #4c4846;
-  cursor: pointer;
-  font-size: 20px;
 }
 
 .btn--orange {
