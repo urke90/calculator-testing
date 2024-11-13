@@ -5,7 +5,7 @@ class Calculator {
     score: 0,
   };
 
-  methods = {
+  methods: { [key: string]: (a: number, b: number) => number } = {
     '+': (a, b) => a + b,
     '-': (a, b) => a - b,
     '*': (a, b) => a * b,
@@ -13,7 +13,7 @@ class Calculator {
     '%': (a, b) => (a / b) * 100,
   };
 
-  operate(a, b, operator) {
+  operate(a: number, b: number, operator: string) {
     this.state.a = a;
     this.state.b = b;
     this.state.score = this.methods[operator](a, b);
