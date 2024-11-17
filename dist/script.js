@@ -7,7 +7,7 @@ const OPERATIONS = {
     MULTIPLY: '*',
     DIVIDE: '/',
     PERCENTAGE: '%',
-    NEGATIVE: 'negative',
+    TOGGLE_SIGN: 'toggle-sign',
     DECIMAL: '.',
     EQUALS: '=',
 };
@@ -35,9 +35,9 @@ class Calculator {
     }
     operate() {
         const { a, b, operator } = this.state;
-        console.log('a', a);
-        console.log('b', b);
-        console.log('operator', operator);
+        // console.log('a', a);
+        // console.log('b', b);
+        // console.log('operator', operator);
         const firstNumber = Number(a);
         const secondNumber = Number(b);
         const score = this.methods[this.state.operator](firstNumber, secondNumber);
@@ -45,19 +45,71 @@ class Calculator {
         this.generateDisplayScore(true);
         this.state.a = score.toString();
         this.state.b = '';
+        console.log('this state u operate()', this.state);
     }
     getNumber(num) {
         console.log('num', num);
         if (this.state.isFirstNumber) {
             this.state.a += num;
+            console.log('getNumber a', this.state.a);
         }
         else {
             this.state.b += num;
+            console.log('getNumber b', this.state.b);
         }
         this.generateDisplayScore();
     }
+    // toggleNumberSign() {
+    //   console.log('this.state. BEFORE', this.state);
+    //   const { a, b, isFirstNumber } = this.state;
+    //   if (isFirstNumber) {
+    //     if (a.startsWith('-')) {
+    //       this.state.a = a.replace('-', '');
+    //     } else {
+    //       this.state.a = `-${a}`;
+    //     }
+    //   } else {
+    //     if (b.startsWith('-')) {
+    //       this.state.b = b.replace('-', '');
+    //     } else {
+    //       this.state.b = `-${b}`;
+    //     }
+    //   }
+    //   this.generateDisplayScore();
+    //   console.log('this.state AFTER', this.state);
+    // }
+    addDecimal() {
+        if (this.state.isFirstNumber) {
+            if (this.state.a.includes('.'))
+                return;
+            this.state.a += '.';
+            this.generateDisplayScore();
+        }
+        else {
+            if (this.state.b.includes('.'))
+                return;
+            this.state.b += '.';
+            this.generateDisplayScore();
+        }
+    }
+    resetAll() {
+        this.state.a = '';
+        this.state.b = '';
+        this.state.isFirstNumber = true;
+        this.state.operator = '';
+        this.state.totalScore = 0;
+        this.generateDisplayScore(true);
+    }
+    generateDisplayScore(displayScoreOnly = false) {
+        const { a, b, operator, totalScore } = this.state;
+        if (displayScoreOnly) {
+            display.textContent = totalScore.toString();
+            return;
+        }
+        display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
+    }
     getOperator(operator) {
-        if (this.state.a === '')
+        if (operator !== OPERATIONS.TOGGLE_SIGN && (this.state.a === '' || this.state.a === '-'))
             return;
         switch (operator) {
             case OPERATIONS.EQUALS: {
@@ -85,40 +137,13 @@ class Calculator {
                 this.addDecimal();
                 return;
             }
+            // case OPERATIONS.TOGGLE_SIGN: {
+            //   this.toggleNumberSign();
+            //   return;
+            // }
             default:
                 throw new Error('Invalid operation!');
         }
-    }
-    generateDisplayScore(displayScoreOnly = false) {
-        const { a, b, operator, totalScore } = this.state;
-        if (displayScoreOnly) {
-            display.textContent = totalScore.toString();
-            return;
-        }
-        display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
-    }
-    resetAll() {
-        this.state.a = '';
-        this.state.b = '';
-        this.state.isFirstNumber = true;
-        this.state.operator = '';
-        this.state.totalScore = 0;
-        this.generateDisplayScore(true);
-    }
-    addDecimal() {
-        if (this.state.isFirstNumber) {
-            if (this.state.a.includes('.'))
-                return;
-            this.state.a += '.';
-            this.generateDisplayScore();
-        }
-        else {
-            if (this.state.b.includes('.'))
-                return;
-            this.state.b += '.';
-            this.generateDisplayScore();
-        }
-        console.log('this.state', this.state);
     }
 }
 const calculator = new Calculator();
