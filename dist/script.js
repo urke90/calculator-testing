@@ -59,26 +59,30 @@ class Calculator {
     getOperator(operator) {
         if (this.state.a === '')
             return;
+        console.log('operator', operator);
         switch (operator) {
-            case OPERATIONS.EQUALS:
-                {
-                    this.operate();
-                }
-                break;
+            case OPERATIONS.EQUALS: {
+                this.operate();
+                return;
+            }
             case OPERATIONS.ADD:
             case OPERATIONS.SUBTRACT:
             case OPERATIONS.MULTIPLY:
             case OPERATIONS.DIVIDE:
-            case OPERATIONS.PERCENTAGE:
-                {
-                    if (this.state.a !== '' && this.state.b !== '' && this.state.operator) {
-                        this.operate();
-                    }
-                    this.state.isFirstNumber = false;
-                    this.state.operator = operator;
-                    console.log('this.state u getOperator', this.state);
+            case OPERATIONS.PERCENTAGE: {
+                if (this.state.a !== '' && this.state.b !== '' && this.state.operator) {
+                    this.operate();
                 }
-                break;
+                this.state.isFirstNumber = false;
+                this.state.operator = operator;
+                console.log('this.state u getOperator', this.state);
+                return;
+            }
+            case OPERATIONS.CLEAR_ALL: {
+                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+                this.resetAll();
+                return;
+            }
             default:
                 throw new Error('Invalid operation!');
         }
@@ -90,6 +94,15 @@ class Calculator {
             return;
         }
         display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
+    }
+    resetAll() {
+        this.state.a = '';
+        this.state.b = '';
+        this.state.isFirstNumber = true;
+        this.state.operator = '';
+        this.state.totalScore = 0;
+        this.generateDisplayScore(true);
+        console.log('this.state', this.state);
     }
 }
 const calculator = new Calculator();
