@@ -88,6 +88,10 @@ class Calculator {
         this.resetAll();
         return;
       }
+      case OPERATIONS.DECIMAL: {
+        this.addDecimal();
+        return;
+      }
 
       default:
         throw new Error('Invalid operation!');
@@ -112,6 +116,20 @@ class Calculator {
     this.state.operator = '';
     this.state.totalScore = 0;
     this.generateDisplayScore(true);
+  }
+
+  addDecimal() {
+    if (this.state.isFirstNumber) {
+      if (this.state.a.includes('.')) return;
+      this.state.a += '.';
+      this.generateDisplayScore();
+    } else {
+      if (this.state.b.includes('.')) return;
+      this.state.b += '.';
+      this.generateDisplayScore();
+    }
+
+    console.log('this.state', this.state);
   }
 }
 
