@@ -59,7 +59,6 @@ class Calculator {
     getOperator(operator) {
         if (this.state.a === '')
             return;
-        console.log('operator', operator);
         switch (operator) {
             case OPERATIONS.EQUALS: {
                 this.operate();
@@ -75,11 +74,10 @@ class Calculator {
                 }
                 this.state.isFirstNumber = false;
                 this.state.operator = operator;
-                console.log('this.state u getOperator', this.state);
+                this.generateDisplayScore();
                 return;
             }
             case OPERATIONS.CLEAR_ALL: {
-                console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
                 this.resetAll();
                 return;
             }
@@ -102,7 +100,6 @@ class Calculator {
         this.state.operator = '';
         this.state.totalScore = 0;
         this.generateDisplayScore(true);
-        console.log('this.state', this.state);
     }
 }
 const calculator = new Calculator();
@@ -126,39 +123,3 @@ operationButtons.forEach((btn) => {
         calculator.getOperator(btnValue);
     });
 });
-/**
- * 1. uzeti vrednost za prvu cifru, mora da se cuva u varijabli i da se ispise na display-u
- * 2. uzeti vrednosti operatora (+ - / * %) i sacuvati u varijabli spojiti sa vrdnosti prve cifre i ispisati na display-u
- * 3. uzeti vrednosti druge cifre, sacuvati u varijabli, i pridodati na vrednost display-a
- * 4. user click na "="  i poziva se funkcija operate() i ispisujemo konacnu vrednost na display-u
- */
-/**
- * 3 + 5 = 8
- *
- *  - saveNumber()
- *  - saveOperator()
- *  - saveNumber()
- *  - saveOperator()
- *  - operate()
- */
-/**
- * 2 + 6 - 10
- *
- * - saveNumber()
- * - saveOperator()
- * - saveNumber()
- * - saveOperator()
- * - operate()
- *    --- im
- */
-/**
- * 1. saveNumber()
- * 2. saveOperator()
- *    - isFirstNumber = false
- * 3. saveNumber()
- * 4. saveOperator()
- *    - operate()
- *    - this.state.a = score
- *    - this.state.b = ''
- *
- */
