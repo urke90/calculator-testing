@@ -109,8 +109,6 @@ class Calculator {
     this.state.operator = '';
     this.state.totalScore = 0;
     this.generateDisplayScore(true);
-
-    console.log('this. state u reset all', this.state);
   }
 
   generateDisplayScore(displayScoreOnly: boolean = false) {
