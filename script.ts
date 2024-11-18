@@ -1,6 +1,6 @@
 const OPERATIONS = {
   CLEAR_ALL: 'clear-all',
-  CLEAR_FIRST: 'clear-first',
+  CLEAR_FIRST: 'clear-last',
   ADD: '+',
   SUBTRACT: '-',
   MULTIPLY: '*',
