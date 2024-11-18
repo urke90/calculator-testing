@@ -90,6 +90,7 @@ class Calculator {
     const operand = this.getOperand();
 
     if (this.state[operand].includes('.')) return;
+
     this.state[operand] += '.';
     this.generateDisplayScore();
   }
