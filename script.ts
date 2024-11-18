@@ -40,12 +40,17 @@ class Calculator {
 
   operate() {
     const { a, b, operator } = this.state;
-    console.log('a', a);
-    console.log('b', b);
-    // console.log('operator', operator);
+    console.log('a u operate', a);
+    console.log('b u operate', b);
+    console.log('operator u operate', operator);
 
     const firstNumber = Number(a);
     const secondNumber = Number(b);
+
+    if (operator === OPERATIONS.DIVIDE && secondNumber === 0) {
+      alert('Division by 0 is not allowed');
+      return;
+    }
 
     const score = this.methods[this.state.operator](firstNumber, secondNumber);
     this.state.totalScore = score;
@@ -61,6 +66,8 @@ class Calculator {
     const operand = this.getOperand();
 
     this.state[operand] += num;
+
+    console.log('this state u getNumber()', this.state);
 
     this.generateDisplayScore();
   }
@@ -102,6 +109,8 @@ class Calculator {
     this.state.operator = '';
     this.state.totalScore = 0;
     this.generateDisplayScore(true);
+
+    console.log('this. state u reset all', this.state);
   }
 
   generateDisplayScore(displayScoreOnly: boolean = false) {
@@ -116,20 +125,25 @@ class Calculator {
   }
 
   getOperator(operator: string) {
-    if (operator !== OPERATIONS.TOGGLE_SIGN && (this.state.a === '' || this.state.a === '-'))
+    if (operator === OPERATIONS.CLEAR_ALL) {
+      this.resetAll();
       return;
+    }
+
+    if (operator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
+      this.operate();
+      return;
+    }
+
+    if (this.state.a === '' || this.state.a === '-') return;
 
     switch (operator) {
-      case OPERATIONS.EQUALS: {
-        this.operate();
-        return;
-      }
       case OPERATIONS.ADD:
       case OPERATIONS.SUBTRACT:
       case OPERATIONS.MULTIPLY:
       case OPERATIONS.DIVIDE:
       case OPERATIONS.PERCENTAGE: {
-        if (this.state.a !== '' && this.state.b !== '' && this.state.operator) {
+        if (this.areOperandsValid() && this.state.operator) {
           this.operate();
         }
 
@@ -139,10 +153,7 @@ class Calculator {
 
         return;
       }
-      case OPERATIONS.CLEAR_ALL: {
-        this.resetAll();
-        return;
-      }
+
       case OPERATIONS.DECIMAL: {
         this.addDecimal();
         return;
@@ -155,6 +166,12 @@ class Calculator {
       default:
         throw new Error('Invalid operation!');
     }
+  }
+
+  areOperandsValid() {
+    return (
+      this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-'
+    );
   }
 }
 
