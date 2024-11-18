@@ -74,21 +74,15 @@ class Calculator {
 
   toggleNumberSign() {
     console.log('this.state. BEFORE', this.state);
-    const { a, b, isFirstNumber } = this.state;
 
-    if (isFirstNumber) {
-      if (a.startsWith('-')) {
-        this.state.a = a.replace('-', '');
-      } else {
-        this.state.a = `-${a}`;
-      }
+    const currentOperand = this.getCurrentOperand();
+
+    if (this.state[currentOperand].startsWith('-')) {
+      this.state[currentOperand] = this.state[currentOperand].replace('-', '');
     } else {
-      if (b.startsWith('-')) {
-        this.state.b = b.replace('-', '');
-      } else {
-        this.state.b = `-${b}`;
-      }
+      this.state[currentOperand] = `-${this.state[currentOperand]}`;
     }
+
     this.generateDisplayScore();
     console.log('this.state AFTER', this.state);
   }
@@ -128,6 +122,11 @@ class Calculator {
       return;
     }
 
+    if (operator === OPERATIONS.TOGGLE_SIGN) {
+      this.toggleNumberSign();
+      return;
+    }
+
     if (operator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
       this.operate();
       return;
@@ -156,10 +155,6 @@ class Calculator {
         this.addDecimal();
         return;
       }
-      // case OPERATIONS.TOGGLE_SIGN: {
-      //   this.toggleNumberSign();
-      //   return;
-      // }
 
       default:
         throw new Error('Invalid operation!');
