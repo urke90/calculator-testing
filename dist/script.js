@@ -33,10 +33,13 @@ class Calculator {
             '%': (a, b) => (a / b) * 100,
         };
     }
+    getOperand() {
+        return this.state.isFirstNumber ? 'a' : 'b';
+    }
     operate() {
         const { a, b, operator } = this.state;
-        // console.log('a', a);
-        // console.log('b', b);
+        console.log('a', a);
+        console.log('b', b);
         // console.log('operator', operator);
         const firstNumber = Number(a);
         const secondNumber = Number(b);
@@ -49,14 +52,8 @@ class Calculator {
     }
     getNumber(num) {
         console.log('num', num);
-        if (this.state.isFirstNumber) {
-            this.state.a += num;
-            console.log('getNumber a', this.state.a);
-        }
-        else {
-            this.state.b += num;
-            console.log('getNumber b', this.state.b);
-        }
+        const operand = this.getOperand();
+        this.state[operand] += num;
         this.generateDisplayScore();
     }
     // toggleNumberSign() {
@@ -79,18 +76,11 @@ class Calculator {
     //   console.log('this.state AFTER', this.state);
     // }
     addDecimal() {
-        if (this.state.isFirstNumber) {
-            if (this.state.a.includes('.'))
-                return;
-            this.state.a += '.';
-            this.generateDisplayScore();
-        }
-        else {
-            if (this.state.b.includes('.'))
-                return;
-            this.state.b += '.';
-            this.generateDisplayScore();
-        }
+        const operand = this.getOperand();
+        if (this.state[operand].includes('.'))
+            return;
+        this.state[operand] += '.';
+        this.generateDisplayScore();
     }
     resetAll() {
         this.state.a = '';
