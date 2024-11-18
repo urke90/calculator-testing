@@ -1,7 +1,7 @@
 "use strict";
 const OPERATIONS = {
     CLEAR_ALL: 'clear-all',
-    CLEAR_FIRST: 'clear-first',
+    CLEAR_FIRST: 'clear-last',
     ADD: '+',
     SUBTRACT: '-',
     MULTIPLY: '*',
@@ -33,7 +33,7 @@ class Calculator {
             '%': (a, b) => (a / b) * 100,
         };
     }
-    getOperand() {
+    getCurrentOperand() {
         return this.state.isFirstNumber ? 'a' : 'b';
     }
     operate() {
@@ -56,32 +56,35 @@ class Calculator {
     }
     getNumber(num) {
         console.log('num', num);
-        const operand = this.getOperand();
+        const operand = this.getCurrentOperand();
         this.state[operand] += num;
         console.log('this state u getNumber()', this.state);
         this.generateDisplayScore();
     }
-    // toggleNumberSign() {
-    //   console.log('this.state. BEFORE', this.state);
-    //   const { a, b, isFirstNumber } = this.state;
-    //   if (isFirstNumber) {
-    //     if (a.startsWith('-')) {
-    //       this.state.a = a.replace('-', '');
-    //     } else {
-    //       this.state.a = `-${a}`;
-    //     }
-    //   } else {
-    //     if (b.startsWith('-')) {
-    //       this.state.b = b.replace('-', '');
-    //     } else {
-    //       this.state.b = `-${b}`;
-    //     }
-    //   }
-    //   this.generateDisplayScore();
-    //   console.log('this.state AFTER', this.state);
-    // }
+    toggleNumberSign() {
+        console.log('this.state. BEFORE', this.state);
+        const { a, b, isFirstNumber } = this.state;
+        if (isFirstNumber) {
+            if (a.startsWith('-')) {
+                this.state.a = a.replace('-', '');
+            }
+            else {
+                this.state.a = `-${a}`;
+            }
+        }
+        else {
+            if (b.startsWith('-')) {
+                this.state.b = b.replace('-', '');
+            }
+            else {
+                this.state.b = `-${b}`;
+            }
+        }
+        this.generateDisplayScore();
+        console.log('this.state AFTER', this.state);
+    }
     addDecimal() {
-        const operand = this.getOperand();
+        const operand = this.getCurrentOperand();
         if (this.state[operand].includes('.'))
             return;
         this.state[operand] += '.';
@@ -94,7 +97,6 @@ class Calculator {
         this.state.operator = '';
         this.state.totalScore = 0;
         this.generateDisplayScore(true);
-        console.log('this. state u reset all', this.state);
     }
     generateDisplayScore(displayScoreOnly = false) {
         const { a, b, operator, totalScore } = this.state;

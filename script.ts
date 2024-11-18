@@ -34,7 +34,7 @@ class Calculator {
     '%': (a, b) => (a / b) * 100,
   };
 
-  getOperand() {
+  getCurrentOperand() {
     return this.state.isFirstNumber ? 'a' : 'b';
   }
 
@@ -63,7 +63,7 @@ class Calculator {
 
   getNumber(num: string) {
     console.log('num', num);
-    const operand = this.getOperand();
+    const operand = this.getCurrentOperand();
 
     this.state[operand] += num;
 
@@ -72,29 +72,29 @@ class Calculator {
     this.generateDisplayScore();
   }
 
-  // toggleNumberSign() {
-  //   console.log('this.state. BEFORE', this.state);
-  //   const { a, b, isFirstNumber } = this.state;
+  toggleNumberSign() {
+    console.log('this.state. BEFORE', this.state);
+    const { a, b, isFirstNumber } = this.state;
 
-  //   if (isFirstNumber) {
-  //     if (a.startsWith('-')) {
-  //       this.state.a = a.replace('-', '');
-  //     } else {
-  //       this.state.a = `-${a}`;
-  //     }
-  //   } else {
-  //     if (b.startsWith('-')) {
-  //       this.state.b = b.replace('-', '');
-  //     } else {
-  //       this.state.b = `-${b}`;
-  //     }
-  //   }
-  //   this.generateDisplayScore();
-  //   console.log('this.state AFTER', this.state);
-  // }
+    if (isFirstNumber) {
+      if (a.startsWith('-')) {
+        this.state.a = a.replace('-', '');
+      } else {
+        this.state.a = `-${a}`;
+      }
+    } else {
+      if (b.startsWith('-')) {
+        this.state.b = b.replace('-', '');
+      } else {
+        this.state.b = `-${b}`;
+      }
+    }
+    this.generateDisplayScore();
+    console.log('this.state AFTER', this.state);
+  }
 
   addDecimal() {
-    const operand = this.getOperand();
+    const operand = this.getCurrentOperand();
 
     if (this.state[operand].includes('.')) return;
 
