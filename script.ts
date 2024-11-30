@@ -1,3 +1,14 @@
+// https://stackoverflow.com/questions/54416318/how-to-make-a-undo-redo-function
+
+interface IState {
+  a: string;
+  b: string;
+  operator: string;
+  totalScore: number;
+  display: string;
+  isFirstNumber: boolean;
+}
+
 const OPERATIONS = {
   CLEAR_ALL: 'clear-all',
   CLEAR_FIRST: 'clear-last',
@@ -40,9 +51,6 @@ class Calculator {
 
   operate() {
     const { a, b, operator } = this.state;
-    console.log('a u operate', a);
-    console.log('b u operate', b);
-    console.log('operator u operate', operator);
 
     const firstNumber = Number(a);
     const secondNumber = Number(b);
@@ -57,24 +65,17 @@ class Calculator {
     this.generateDisplayScore(true);
     this.state.a = score.toString();
     this.state.b = '';
-
-    console.log('this state u operate()', this.state);
   }
 
   getNumber(num: string) {
-    console.log('num', num);
     const operand = this.getCurrentOperand();
 
     this.state[operand] += num;
-
-    console.log('this state u getNumber()', this.state);
 
     this.generateDisplayScore();
   }
 
   toggleNumberSign() {
-    console.log('this.state. BEFORE', this.state);
-
     const currentOperand = this.getCurrentOperand();
 
     if (this.state[currentOperand].startsWith('-')) {
@@ -84,7 +85,6 @@ class Calculator {
     }
 
     this.generateDisplayScore();
-    console.log('this.state AFTER', this.state);
   }
 
   addDecimal() {
@@ -169,6 +169,18 @@ class Calculator {
 }
 
 const calculator = new Calculator();
+
+class CalculatorMemento {
+  state: IState;
+
+  constructor(state: IState) {
+    this.state = state;
+  }
+
+  getState() {
+    return this.state;
+  }
+}
 
 numberButtons.forEach((btn) => {
   btn.addEventListener('click', (e) => {

@@ -1,4 +1,5 @@
 "use strict";
+// https://stackoverflow.com/questions/54416318/how-to-make-a-undo-redo-function
 const OPERATIONS = {
     CLEAR_ALL: 'clear-all',
     CLEAR_FIRST: 'clear-last',
