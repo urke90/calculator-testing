@@ -182,6 +182,22 @@ class CalculatorMemento {
   }
 }
 
+class Caretaker {
+  history: CalculatorMemento[];
+
+  constructor() {
+    this.history = [];
+  }
+
+  push(state: IState) {
+    this.history.push(state);
+  }
+  pop() {
+    if (this.history.length === 0) return;
+    return this.history.pop();
+  }
+}
+
 numberButtons.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
