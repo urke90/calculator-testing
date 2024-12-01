@@ -35,7 +35,7 @@ const calculatorContainer = document.getElementById('calculator')!;
 const display = calculatorContainer.querySelector('[data-display]')!;
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]')!;
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]')!;
-
+const decimalButton = calculatorContainer.querySelector('[data-decimal-button]')!;
 class Caretaker {
   history: CalculatorMemento[];
 
@@ -136,6 +136,11 @@ class Calculator {
   }
 
   addDecimal() {
+    const currentOperand = this.getCurrentOperand();
+    const isValidOperand = this.isValidOperand(currentOperand);
+
+    if (!isValidOperand) return;
+
     this.saveState();
     const operand = this.getCurrentOperand();
 
@@ -166,6 +171,7 @@ class Calculator {
   }
 
   getOperator(inputOperator: string) {
+    console.log('inputOperator', inputOperator);
     if (inputOperator === OPERATIONS.CLEAR_ALL) {
       this.resetAll();
       return;
@@ -193,24 +199,19 @@ class Calculator {
         if (this.areOperandsValid() && this.state.operator) {
           this.operate();
         }
-
         this.state.isFirstNumber = false;
         this.state.operator = inputOperator;
         this.generateDisplayScore();
-
         return;
       }
-
       case OPERATIONS.DECIMAL: {
         this.addDecimal();
         return;
       }
-
       case OPERATIONS.UNDO: {
         this.undo();
         return;
       }
-
       default:
         throw new Error('Invalid operation!');
     }
@@ -221,6 +222,11 @@ class Calculator {
       this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-'
     );
   }
+
+  isValidOperand(currentOperand: 'a' | 'b') {
+    return this.state[currentOperand] !== '-' && this.state[currentOperand] !== '';
+  }
+
   getCurrentOperand() {
     return this.state.isFirstNumber ? 'a' : 'b';
   }
@@ -267,3 +273,5 @@ operationButtons.forEach((btn) => {
     calculator.getOperator(btnValue);
   });
 });
+
+decimalButton.addEventListener('click', calculator.addDecimal);

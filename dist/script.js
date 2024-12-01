@@ -24,6 +24,7 @@ const calculatorContainer = document.getElementById('calculator');
 const display = calculatorContainer.querySelector('[data-display]');
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]');
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]');
+const decimalButton = calculatorContainer.querySelector('[data-decimal-button]');
 class Caretaker {
     constructor() {
         this.history = [];
@@ -104,6 +105,10 @@ class Calculator {
         this.generateDisplayScore();
     }
     addDecimal() {
+        const currentOperand = this.getCurrentOperand();
+        const isValidOperand = this.isValidOperand(currentOperand);
+        if (!isValidOperand)
+            return;
         this.saveState();
         const operand = this.getCurrentOperand();
         if (this.state[operand].includes('.'))
@@ -128,6 +133,7 @@ class Calculator {
         display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
     }
     getOperator(inputOperator) {
+        console.log('inputOperator', inputOperator);
         if (inputOperator === OPERATIONS.CLEAR_ALL) {
             this.resetAll();
             return;
@@ -172,6 +178,9 @@ class Calculator {
     areOperandsValid() {
         return (this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-');
     }
+    isValidOperand(currentOperand) {
+        return this.state[currentOperand] !== '-' && this.state[currentOperand] !== '';
+    }
     getCurrentOperand() {
         return this.state.isFirstNumber ? 'a' : 'b';
     }
@@ -205,3 +214,4 @@ operationButtons.forEach((btn) => {
         calculator.getOperator(btnValue);
     });
 });
+decimalButton.addEventListener('click', calculator.addDecimal);
