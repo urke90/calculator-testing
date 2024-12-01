@@ -36,6 +36,8 @@ const display = calculatorContainer.querySelector('[data-display]')!;
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]')!;
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]')!;
 const decimalButton = calculatorContainer.querySelector('[data-decimal-button]')!;
+const resetAllButton = calculatorContainer.querySelector('[data-reset-all-button]');
+
 class Caretaker {
   history: CalculatorMemento[];
 
@@ -171,12 +173,6 @@ class Calculator {
   }
 
   getOperator(inputOperator: string) {
-    console.log('inputOperator', inputOperator);
-    if (inputOperator === OPERATIONS.CLEAR_ALL) {
-      this.resetAll();
-      return;
-    }
-
     if (inputOperator === OPERATIONS.TOGGLE_SIGN) {
       this.toggleNumberSign();
       return;
@@ -204,10 +200,7 @@ class Calculator {
         this.generateDisplayScore();
         return;
       }
-      // case OPERATIONS.DECIMAL: {
-      //   this.addDecimal();
-      //   return;
-      // }
+
       case OPERATIONS.UNDO: {
         this.undo();
         return;
@@ -275,3 +268,5 @@ operationButtons.forEach((btn) => {
 });
 
 decimalButton.addEventListener('click', calculator.addDecimal);
+
+resetAllButton?.addEventListener('click', calculator.resetAll);

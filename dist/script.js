@@ -25,6 +25,7 @@ const display = calculatorContainer.querySelector('[data-display]');
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]');
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]');
 const decimalButton = calculatorContainer.querySelector('[data-decimal-button]');
+const resetAllButton = calculatorContainer.querySelector('[data-reset-all-button]');
 class Caretaker {
     constructor() {
         this.history = [];
@@ -133,11 +134,6 @@ class Calculator {
         display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
     }
     getOperator(inputOperator) {
-        console.log('inputOperator', inputOperator);
-        if (inputOperator === OPERATIONS.CLEAR_ALL) {
-            this.resetAll();
-            return;
-        }
         if (inputOperator === OPERATIONS.TOGGLE_SIGN) {
             this.toggleNumberSign();
             return;
@@ -161,10 +157,6 @@ class Calculator {
                 this.state.isFirstNumber = false;
                 this.state.operator = inputOperator;
                 this.generateDisplayScore();
-                return;
-            }
-            case OPERATIONS.DECIMAL: {
-                this.addDecimal();
                 return;
             }
             case OPERATIONS.UNDO: {
@@ -215,3 +207,4 @@ operationButtons.forEach((btn) => {
     });
 });
 decimalButton.addEventListener('click', calculator.addDecimal);
+resetAllButton === null || resetAllButton === void 0 ? void 0 : resetAllButton.addEventListener('click', calculator.resetAll);
