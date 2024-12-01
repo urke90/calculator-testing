@@ -2,7 +2,7 @@
 // https://stackoverflow.com/questions/54416318/how-to-make-a-undo-redo-function
 const OPERATIONS = {
     CLEAR_ALL: 'clear-all',
-    CLEAR_FIRST: 'clear-last',
+    UNDO: 'undo',
     ADD: '+',
     SUBTRACT: '-',
     MULTIPLY: '*',
@@ -12,10 +12,31 @@ const OPERATIONS = {
     DECIMAL: '.',
     EQUALS: '=',
 };
+const INIT_STATE = {
+    a: '',
+    b: '',
+    operator: '',
+    totalScore: 0,
+    display: '',
+    isFirstNumber: true,
+};
 const calculatorContainer = document.getElementById('calculator');
 const display = calculatorContainer.querySelector('[data-display]');
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]');
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]');
+class Caretaker {
+    constructor() {
+        this.history = [];
+    }
+    pushNewState(state) {
+        this.history.push(state);
+    }
+    popPrevState() {
+        if (this.history.length === 0)
+            return;
+        return this.history.pop();
+    }
+}
 class Calculator {
     constructor() {
         this.state = {
@@ -26,6 +47,7 @@ class Calculator {
             display: '',
             isFirstNumber: true,
         };
+        this.caretaker = new Caretaker();
         this.methods = {
             '+': (a, b) => a + b,
             '-': (a, b) => a - b,
@@ -34,14 +56,23 @@ class Calculator {
             '%': (a, b) => (a / b) * 100,
         };
     }
-    getCurrentOperand() {
-        return this.state.isFirstNumber ? 'a' : 'b';
+    saveState() {
+        const memento = new CalculatorMemento(Object.assign({}, this.state));
+        this.caretaker.pushNewState(memento);
+    }
+    undo() {
+        console.log('this.state u UNDO', this.state);
+        const memento = this.caretaker.popPrevState();
+        if (memento) {
+            console.log('memento.getState', memento.getState());
+            this.state = Object.assign({}, memento.getState());
+            this.generateDisplayScore();
+        }
     }
     operate() {
+        console.log('this.state u operate BEFORE', this.state);
+        this.saveState();
         const { a, b, operator } = this.state;
-        console.log('a u operate', a);
-        console.log('b u operate', b);
-        console.log('operator u operate', operator);
         const firstNumber = Number(a);
         const secondNumber = Number(b);
         if (operator === OPERATIONS.DIVIDE && secondNumber === 0) {
@@ -53,17 +84,16 @@ class Calculator {
         this.generateDisplayScore(true);
         this.state.a = score.toString();
         this.state.b = '';
-        console.log('this state u operate()', this.state);
+        console.log('this.state u operate AFTER', this.state);
     }
     getNumber(num) {
-        console.log('num', num);
+        this.saveState();
         const operand = this.getCurrentOperand();
         this.state[operand] += num;
-        console.log('this state u getNumber()', this.state);
         this.generateDisplayScore();
     }
     toggleNumberSign() {
-        console.log('this.state. BEFORE', this.state);
+        this.saveState();
         const currentOperand = this.getCurrentOperand();
         if (this.state[currentOperand].startsWith('-')) {
             this.state[currentOperand] = this.state[currentOperand].replace('-', '');
@@ -72,9 +102,9 @@ class Calculator {
             this.state[currentOperand] = `-${this.state[currentOperand]}`;
         }
         this.generateDisplayScore();
-        console.log('this.state AFTER', this.state);
     }
     addDecimal() {
+        this.saveState();
         const operand = this.getCurrentOperand();
         if (this.state[operand].includes('.'))
             return;
@@ -97,37 +127,42 @@ class Calculator {
         }
         display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
     }
-    getOperator(operator) {
-        if (operator === OPERATIONS.CLEAR_ALL) {
+    getOperator(inputOperator) {
+        if (inputOperator === OPERATIONS.CLEAR_ALL) {
             this.resetAll();
             return;
         }
-        if (operator === OPERATIONS.TOGGLE_SIGN) {
+        if (inputOperator === OPERATIONS.TOGGLE_SIGN) {
             this.toggleNumberSign();
             return;
         }
-        if (operator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
+        if (inputOperator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
             this.operate();
             return;
         }
         if (this.state.a === '' || this.state.a === '-')
             return;
-        switch (operator) {
+        switch (inputOperator) {
             case OPERATIONS.ADD:
             case OPERATIONS.SUBTRACT:
             case OPERATIONS.MULTIPLY:
             case OPERATIONS.DIVIDE:
             case OPERATIONS.PERCENTAGE: {
+                this.saveState();
                 if (this.areOperandsValid() && this.state.operator) {
                     this.operate();
                 }
                 this.state.isFirstNumber = false;
-                this.state.operator = operator;
+                this.state.operator = inputOperator;
                 this.generateDisplayScore();
                 return;
             }
             case OPERATIONS.DECIMAL: {
                 this.addDecimal();
+                return;
+            }
+            case OPERATIONS.UNDO: {
+                this.undo();
                 return;
             }
             default:
@@ -137,8 +172,19 @@ class Calculator {
     areOperandsValid() {
         return (this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-');
     }
+    getCurrentOperand() {
+        return this.state.isFirstNumber ? 'a' : 'b';
+    }
 }
 const calculator = new Calculator();
+class CalculatorMemento {
+    constructor(state) {
+        this.state = state;
+    }
+    getState() {
+        return this.state;
+    }
+}
 numberButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
         const element = e.target;

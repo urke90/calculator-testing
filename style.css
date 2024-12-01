@@ -31,6 +31,7 @@ button {
 }
 
 .display {
+  min-height: calc(65.5px - calc(30px + 6px));
   padding: 15px 10px;
   background-color: #575351;
   border-bottom: 6px solid #3e3b3a;
