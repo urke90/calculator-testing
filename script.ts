@@ -204,10 +204,10 @@ class Calculator {
         this.generateDisplayScore();
         return;
       }
-      case OPERATIONS.DECIMAL: {
-        this.addDecimal();
-        return;
-      }
+      // case OPERATIONS.DECIMAL: {
+      //   this.addDecimal();
+      //   return;
+      // }
       case OPERATIONS.UNDO: {
         this.undo();
         return;
