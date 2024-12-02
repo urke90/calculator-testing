@@ -51,7 +51,11 @@ class Caretaker {
   }
 
   pushNewState(state: CalculatorMemento) {
-    this.history.push(state);
+    const lastSavedState = this.history[this.history.length - 1];
+
+    if (!lastSavedState || JSON.stringify(lastSavedState) !== JSON.stringify(state)) {
+      this.history.push(state);
+    }
   }
 
   popPrevState() {
@@ -98,7 +102,8 @@ class Calculator {
   }
 
   operate() {
-    const areOperandsValid = this.areOperandsValid() && this.state.operator;
+    const areOperandsValid = this.areOperandsValid() && this.state.operator !== '';
+    console.log('areOperandsValid', areOperandsValid);
 
     if (!areOperandsValid) return;
 
@@ -183,25 +188,13 @@ class Calculator {
   getOperator(inputOperator: string) {
     if (this.state.a === '' || this.state.a === '-') return;
 
-    switch (inputOperator) {
-      case OPERATIONS.ADD:
-      case OPERATIONS.SUBTRACT:
-      case OPERATIONS.MULTIPLY:
-      case OPERATIONS.DIVIDE:
-      case OPERATIONS.PERCENTAGE: {
-        this.saveState();
-        if (this.areOperandsValid() && this.state.operator) {
-          this.operate();
-        }
-        this.state.isFirstNumber = false;
-        this.state.operator = inputOperator;
-        this.generateDisplayScore();
-        return;
-      }
-
-      default:
-        throw new Error('Invalid operation!');
+    this.saveState();
+    if (this.areOperandsValid() && this.state.operator) {
+      this.operate();
     }
+    this.state.isFirstNumber = false;
+    this.state.operator = inputOperator;
+    this.generateDisplayScore();
   }
 
   areOperandsValid() {
@@ -246,6 +239,7 @@ numberButtons.forEach((btn) => {
     calculator.getNumber(btnValue);
   });
 });
+
 operationButtons.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
@@ -259,8 +253,18 @@ operationButtons.forEach((btn) => {
     calculator.getOperator(btnValue);
   });
 });
+
 decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
 resetAllButton?.addEventListener('click', calculator.resetAll.bind(calculator));
 toggleNumberSignButton?.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
 equalsButton?.addEventListener('click', () => calculator.operate.bind(calculator));
 undoButton?.addEventListener('click', calculator.undo.bind(calculator));
+
+/**
+ * 1. getNumber()
+ * 2. getOperator()
+ * 3. getNumber()
+ * 4. getOperator()
+ * 5. undo()
+ * 6. undo()
+ */
