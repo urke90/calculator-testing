@@ -9,6 +9,27 @@ interface IState {
   isFirstNumber: boolean;
 }
 
+interface ICalculatorMemento {
+  readonly state: IState;
+  getState(): IState;
+}
+
+interface ICaretaker {
+  history: CalculatorMemento[];
+  pushNewState(state: CalculatorMemento): void;
+  popPrevState(): CalculatorMemento | undefined;
+}
+
+interface ICalculator {
+  undo(): void;
+  operate(): void;
+  getNumber(num: string): void;
+  toggleNumberSign(): void;
+  addDecimal(): void;
+  resetAll(): void;
+  getOperator(inputOperator: string): void;
+}
+
 const OPERATIONS = {
   CLEAR_ALL: 'clear-all',
   UNDO: 'undo',
@@ -43,25 +64,23 @@ const toggleNumberSignButton = calculatorContainer.querySelector(
 const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
 const undoButton = calculatorContainer.querySelector('[data-undo-button]');
 
-class CalculatorMemento {
-  state: IState;
-
-  constructor(state: IState) {
+class CalculatorMemento implements ICalculatorMemento {
+  constructor(readonly state: IState) {
     this.state = state;
   }
 
-  getState() {
+  public getState() {
     return this.state;
   }
 }
-class Caretaker {
+class Caretaker implements ICaretaker {
   history: CalculatorMemento[];
 
   constructor() {
     this.history = [];
   }
 
-  pushNewState(state: CalculatorMemento) {
+  public pushNewState(state: CalculatorMemento) {
     const lastSavedState = this.history[this.history.length - 1];
 
     if (!lastSavedState || JSON.stringify(lastSavedState) !== JSON.stringify(state)) {
@@ -69,14 +88,14 @@ class Caretaker {
     }
   }
 
-  popPrevState() {
+  public popPrevState() {
     if (this.history.length === 0) return;
     return this.history.pop();
   }
 }
 
-class Calculator {
-  state = {
+class Calculator implements ICalculator {
+  private state = {
     a: '',
     b: '',
     operator: '',
@@ -85,9 +104,9 @@ class Calculator {
     isFirstNumber: true,
   };
 
-  caretaker = new Caretaker();
+  private caretaker = new Caretaker();
 
-  methods: { [key: string]: (a: number, b: number) => number } = {
+  private methods: { [key: string]: (a: number, b: number) => number } = {
     '+': (a, b) => a + b,
     '-': (a, b) => a - b,
     '*': (a, b) => a * b,
@@ -95,12 +114,12 @@ class Calculator {
     '%': (a, b) => (a / b) * 100,
   };
 
-  saveState() {
+  private saveState() {
     const memento = new CalculatorMemento({ ...this.state });
     this.caretaker.pushNewState(memento);
   }
 
-  undo() {
+  public undo() {
     const memento = this.caretaker.popPrevState();
 
     if (memento) {
@@ -109,7 +128,7 @@ class Calculator {
     }
   }
 
-  operate() {
+  public operate() {
     const areOperandsValid = this.areOperandsValid() && this.state.operator !== '';
 
     if (!areOperandsValid) return;
@@ -133,7 +152,7 @@ class Calculator {
     this.state.b = '';
   }
 
-  getNumber(num: string) {
+  public getNumber(num: string) {
     this.saveState();
     const operand = this.getCurrentOperand();
 
@@ -142,7 +161,7 @@ class Calculator {
     this.generateDisplayScore();
   }
 
-  toggleNumberSign() {
+  public toggleNumberSign() {
     this.saveState();
     const currentOperand = this.getCurrentOperand();
 
@@ -155,7 +174,7 @@ class Calculator {
     this.generateDisplayScore();
   }
 
-  addDecimal() {
+  public addDecimal() {
     const currentOperand = this.getCurrentOperand();
     const isValidOperand = this.isValidOperand(currentOperand);
 
@@ -170,7 +189,7 @@ class Calculator {
     this.generateDisplayScore();
   }
 
-  resetAll() {
+  public resetAll() {
     this.state.a = '';
     this.state.b = '';
     this.state.isFirstNumber = true;
@@ -179,18 +198,7 @@ class Calculator {
     this.generateDisplayScore(true);
   }
 
-  generateDisplayScore(displayScoreOnly: boolean = false) {
-    const { a, b, operator, totalScore } = this.state;
-
-    if (displayScoreOnly) {
-      display.textContent = totalScore.toString();
-      return;
-    }
-
-    display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
-  }
-
-  getOperator(inputOperator: string) {
+  public getOperator(inputOperator: string) {
     if (this.state.a === '' || this.state.a === '-') return;
 
     this.saveState();
@@ -202,17 +210,28 @@ class Calculator {
     this.generateDisplayScore();
   }
 
-  areOperandsValid() {
+  private generateDisplayScore(displayScoreOnly: boolean = false) {
+    const { a, b, operator, totalScore } = this.state;
+
+    if (displayScoreOnly) {
+      display.textContent = totalScore.toString();
+      return;
+    }
+
+    display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
+  }
+
+  private areOperandsValid() {
     return (
       this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-'
     );
   }
 
-  isValidOperand(currentOperand: 'a' | 'b') {
+  private isValidOperand(currentOperand: 'a' | 'b') {
     return this.state[currentOperand] !== '-' && this.state[currentOperand] !== '';
   }
 
-  getCurrentOperand() {
+  private getCurrentOperand() {
     return this.state.isFirstNumber ? 'a' : 'b';
   }
 }

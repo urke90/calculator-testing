@@ -32,6 +32,7 @@ const undoButton = calculatorContainer.querySelector('[data-undo-button]');
 class CalculatorMemento {
     constructor(state) {
         this.state = state;
+        this.state = state;
     }
     getState() {
         return this.state;
@@ -138,14 +139,6 @@ class Calculator {
         this.state.totalScore = 0;
         this.generateDisplayScore(true);
     }
-    generateDisplayScore(displayScoreOnly = false) {
-        const { a, b, operator, totalScore } = this.state;
-        if (displayScoreOnly) {
-            display.textContent = totalScore.toString();
-            return;
-        }
-        display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
-    }
     getOperator(inputOperator) {
         if (this.state.a === '' || this.state.a === '-')
             return;
@@ -156,6 +149,14 @@ class Calculator {
         this.state.isFirstNumber = false;
         this.state.operator = inputOperator;
         this.generateDisplayScore();
+    }
+    generateDisplayScore(displayScoreOnly = false) {
+        const { a, b, operator, totalScore } = this.state;
+        if (displayScoreOnly) {
+            display.textContent = totalScore.toString();
+            return;
+        }
+        display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
     }
     areOperandsValid() {
         return (this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-');
