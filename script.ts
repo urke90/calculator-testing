@@ -41,6 +41,7 @@ const toggleNumberSignButton = calculatorContainer.querySelector(
   '[data-toggle-number-sign-button]'
 );
 const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
+const undoButton = calculatorContainer.querySelector('[data-undo-button]');
 
 class Caretaker {
   history: CalculatorMemento[];
@@ -180,11 +181,6 @@ class Calculator {
   }
 
   getOperator(inputOperator: string) {
-    // if (inputOperator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
-    //   this.operate();
-    //   return;
-    // }
-
     if (this.state.a === '' || this.state.a === '-') return;
 
     switch (inputOperator) {
@@ -203,10 +199,6 @@ class Calculator {
         return;
       }
 
-      case OPERATIONS.UNDO: {
-        this.undo();
-        return;
-      }
       default:
         throw new Error('Invalid operation!');
     }
@@ -271,3 +263,4 @@ decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
 resetAllButton?.addEventListener('click', calculator.resetAll.bind(calculator));
 toggleNumberSignButton?.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
 equalsButton?.addEventListener('click', () => calculator.operate.bind(calculator));
+undoButton?.addEventListener('click', calculator.undo.bind(calculator));
