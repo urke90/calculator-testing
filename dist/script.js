@@ -1,7 +1,8 @@
 "use strict";
+// https://stackoverflow.com/questions/54416318/how-to-make-a-undo-redo-function
 const OPERATIONS = {
     CLEAR_ALL: 'clear-all',
-    CLEAR_FIRST: 'clear-first',
+    UNDO: 'undo',
     ADD: '+',
     SUBTRACT: '-',
     MULTIPLY: '*',
@@ -11,10 +12,47 @@ const OPERATIONS = {
     DECIMAL: '.',
     EQUALS: '=',
 };
+const INIT_STATE = {
+    a: '',
+    b: '',
+    operator: '',
+    totalScore: 0,
+    display: '',
+    isFirstNumber: true,
+};
 const calculatorContainer = document.getElementById('calculator');
 const display = calculatorContainer.querySelector('[data-display]');
 const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]');
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]');
+const decimalButton = calculatorContainer.querySelector('[data-decimal-button]');
+const resetAllButton = calculatorContainer.querySelector('[data-reset-all-button]');
+const toggleNumberSignButton = calculatorContainer.querySelector('[data-toggle-number-sign-button]');
+const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
+const undoButton = calculatorContainer.querySelector('[data-undo-button]');
+class CalculatorMemento {
+    constructor(state) {
+        this.state = state;
+    }
+    getState() {
+        return this.state;
+    }
+}
+class Caretaker {
+    constructor() {
+        this.history = [];
+    }
+    pushNewState(state) {
+        const lastSavedState = this.history[this.history.length - 1];
+        if (!lastSavedState || JSON.stringify(lastSavedState) !== JSON.stringify(state)) {
+            this.history.push(state);
+        }
+    }
+    popPrevState() {
+        if (this.history.length === 0)
+            return;
+        return this.history.pop();
+    }
+}
 class Calculator {
     constructor() {
         this.state = {
@@ -25,6 +63,7 @@ class Calculator {
             display: '',
             isFirstNumber: true,
         };
+        this.caretaker = new Caretaker();
         this.methods = {
             '+': (a, b) => a + b,
             '-': (a, b) => a - b,
@@ -33,14 +72,23 @@ class Calculator {
             '%': (a, b) => (a / b) * 100,
         };
     }
-    getOperand() {
-        return this.state.isFirstNumber ? 'a' : 'b';
+    saveState() {
+        const memento = new CalculatorMemento(Object.assign({}, this.state));
+        this.caretaker.pushNewState(memento);
+    }
+    undo() {
+        const memento = this.caretaker.popPrevState();
+        if (memento) {
+            this.state = Object.assign({}, memento.getState());
+            this.generateDisplayScore();
+        }
     }
     operate() {
+        const areOperandsValid = this.areOperandsValid() && this.state.operator !== '';
+        if (!areOperandsValid)
+            return;
+        this.saveState();
         const { a, b, operator } = this.state;
-        console.log('a u operate', a);
-        console.log('b u operate', b);
-        console.log('operator u operate', operator);
         const firstNumber = Number(a);
         const secondNumber = Number(b);
         if (operator === OPERATIONS.DIVIDE && secondNumber === 0) {
@@ -52,36 +100,31 @@ class Calculator {
         this.generateDisplayScore(true);
         this.state.a = score.toString();
         this.state.b = '';
-        console.log('this state u operate()', this.state);
     }
     getNumber(num) {
-        console.log('num', num);
-        const operand = this.getOperand();
+        this.saveState();
+        const operand = this.getCurrentOperand();
         this.state[operand] += num;
-        console.log('this state u getNumber()', this.state);
         this.generateDisplayScore();
     }
-    // toggleNumberSign() {
-    //   console.log('this.state. BEFORE', this.state);
-    //   const { a, b, isFirstNumber } = this.state;
-    //   if (isFirstNumber) {
-    //     if (a.startsWith('-')) {
-    //       this.state.a = a.replace('-', '');
-    //     } else {
-    //       this.state.a = `-${a}`;
-    //     }
-    //   } else {
-    //     if (b.startsWith('-')) {
-    //       this.state.b = b.replace('-', '');
-    //     } else {
-    //       this.state.b = `-${b}`;
-    //     }
-    //   }
-    //   this.generateDisplayScore();
-    //   console.log('this.state AFTER', this.state);
-    // }
+    toggleNumberSign() {
+        this.saveState();
+        const currentOperand = this.getCurrentOperand();
+        if (this.state[currentOperand].startsWith('-')) {
+            this.state[currentOperand] = this.state[currentOperand].replace('-', '');
+        }
+        else {
+            this.state[currentOperand] = `-${this.state[currentOperand]}`;
+        }
+        this.generateDisplayScore();
+    }
     addDecimal() {
-        const operand = this.getOperand();
+        const currentOperand = this.getCurrentOperand();
+        const isValidOperand = this.isValidOperand(currentOperand);
+        if (!isValidOperand)
+            return;
+        this.saveState();
+        const operand = this.getCurrentOperand();
         if (this.state[operand].includes('.'))
             return;
         this.state[operand] += '.';
@@ -94,7 +137,6 @@ class Calculator {
         this.state.operator = '';
         this.state.totalScore = 0;
         this.generateDisplayScore(true);
-        console.log('this. state u reset all', this.state);
     }
     generateDisplayScore(displayScoreOnly = false) {
         const { a, b, operator, totalScore } = this.state;
@@ -104,45 +146,25 @@ class Calculator {
         }
         display.textContent = `${a.trim()} ${operator.trim()} ${b.trim()}`;
     }
-    getOperator(operator) {
-        if (operator === OPERATIONS.CLEAR_ALL) {
-            this.resetAll();
-            return;
-        }
-        if (operator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
-            this.operate();
-            return;
-        }
+    getOperator(inputOperator) {
         if (this.state.a === '' || this.state.a === '-')
             return;
-        switch (operator) {
-            case OPERATIONS.ADD:
-            case OPERATIONS.SUBTRACT:
-            case OPERATIONS.MULTIPLY:
-            case OPERATIONS.DIVIDE:
-            case OPERATIONS.PERCENTAGE: {
-                if (this.areOperandsValid() && this.state.operator) {
-                    this.operate();
-                }
-                this.state.isFirstNumber = false;
-                this.state.operator = operator;
-                this.generateDisplayScore();
-                return;
-            }
-            case OPERATIONS.DECIMAL: {
-                this.addDecimal();
-                return;
-            }
-            // case OPERATIONS.TOGGLE_SIGN: {
-            //   this.toggleNumberSign();
-            //   return;
-            // }
-            default:
-                throw new Error('Invalid operation!');
+        this.saveState();
+        if (this.areOperandsValid() && this.state.operator) {
+            this.operate();
         }
+        this.state.isFirstNumber = false;
+        this.state.operator = inputOperator;
+        this.generateDisplayScore();
     }
     areOperandsValid() {
         return (this.state.a !== '' && this.state.a !== '-' && this.state.b !== '' && this.state.b !== '-');
+    }
+    isValidOperand(currentOperand) {
+        return this.state[currentOperand] !== '-' && this.state[currentOperand] !== '';
+    }
+    getCurrentOperand() {
+        return this.state.isFirstNumber ? 'a' : 'b';
     }
 }
 const calculator = new Calculator();
@@ -166,3 +188,8 @@ operationButtons.forEach((btn) => {
         calculator.getOperator(btnValue);
     });
 });
+decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
+resetAllButton === null || resetAllButton === void 0 ? void 0 : resetAllButton.addEventListener('click', calculator.resetAll.bind(calculator));
+toggleNumberSignButton === null || toggleNumberSignButton === void 0 ? void 0 : toggleNumberSignButton.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
+equalsButton === null || equalsButton === void 0 ? void 0 : equalsButton.addEventListener('click', calculator.operate.bind(calculator));
+undoButton === null || undoButton === void 0 ? void 0 : undoButton.addEventListener('click', calculator.undo.bind(calculator));
