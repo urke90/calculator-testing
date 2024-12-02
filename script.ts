@@ -37,6 +37,10 @@ const numberButtons = calculatorContainer.querySelectorAll('[data-number-button]
 const operationButtons = calculatorContainer.querySelectorAll('[data-operation-button]')!;
 const decimalButton = calculatorContainer.querySelector('[data-decimal-button]')!;
 const resetAllButton = calculatorContainer.querySelector('[data-reset-all-button]');
+const toggleNumberSignButton = calculatorContainer.querySelector(
+  '[data-toggle-number-sign-button]'
+);
+const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
 
 class Caretaker {
   history: CalculatorMemento[];
@@ -93,9 +97,12 @@ class Calculator {
   }
 
   operate() {
-    console.log('this.state u operate BEFORE', this.state);
+    const areOperandsValid = this.areOperandsValid() && this.state.operator;
+
+    if (!areOperandsValid) return;
 
     this.saveState();
+
     const { a, b, operator } = this.state;
 
     const firstNumber = Number(a);
@@ -173,15 +180,10 @@ class Calculator {
   }
 
   getOperator(inputOperator: string) {
-    if (inputOperator === OPERATIONS.TOGGLE_SIGN) {
-      this.toggleNumberSign();
-      return;
-    }
-
-    if (inputOperator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
-      this.operate();
-      return;
-    }
+    // if (inputOperator === OPERATIONS.EQUALS && this.areOperandsValid() && this.state.operator) {
+    //   this.operate();
+    //   return;
+    // }
 
     if (this.state.a === '' || this.state.a === '-') return;
 
@@ -252,7 +254,6 @@ numberButtons.forEach((btn) => {
     calculator.getNumber(btnValue);
   });
 });
-
 operationButtons.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
@@ -266,7 +267,7 @@ operationButtons.forEach((btn) => {
     calculator.getOperator(btnValue);
   });
 });
-
-decimalButton.addEventListener('click', calculator.addDecimal);
-
-resetAllButton?.addEventListener('click', calculator.resetAll);
+decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
+resetAllButton?.addEventListener('click', calculator.resetAll.bind(calculator));
+toggleNumberSignButton?.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
+equalsButton?.addEventListener('click', () => calculator.operate.bind(calculator));
