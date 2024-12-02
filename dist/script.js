@@ -29,6 +29,14 @@ const resetAllButton = calculatorContainer.querySelector('[data-reset-all-button
 const toggleNumberSignButton = calculatorContainer.querySelector('[data-toggle-number-sign-button]');
 const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
 const undoButton = calculatorContainer.querySelector('[data-undo-button]');
+class CalculatorMemento {
+    constructor(state) {
+        this.state = state;
+    }
+    getState() {
+        return this.state;
+    }
+}
 class Caretaker {
     constructor() {
         this.history = [];
@@ -69,17 +77,14 @@ class Calculator {
         this.caretaker.pushNewState(memento);
     }
     undo() {
-        console.log('this.state u UNDO', this.state);
         const memento = this.caretaker.popPrevState();
         if (memento) {
-            console.log('memento.getState', memento.getState());
             this.state = Object.assign({}, memento.getState());
             this.generateDisplayScore();
         }
     }
     operate() {
         const areOperandsValid = this.areOperandsValid() && this.state.operator !== '';
-        console.log('areOperandsValid', areOperandsValid);
         if (!areOperandsValid)
             return;
         this.saveState();
@@ -95,7 +100,6 @@ class Calculator {
         this.generateDisplayScore(true);
         this.state.a = score.toString();
         this.state.b = '';
-        console.log('this.state u operate AFTER', this.state);
     }
     getNumber(num) {
         this.saveState();
@@ -164,14 +168,6 @@ class Calculator {
     }
 }
 const calculator = new Calculator();
-class CalculatorMemento {
-    constructor(state) {
-        this.state = state;
-    }
-    getState() {
-        return this.state;
-    }
-}
 numberButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
         const element = e.target;
@@ -195,13 +191,5 @@ operationButtons.forEach((btn) => {
 decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
 resetAllButton === null || resetAllButton === void 0 ? void 0 : resetAllButton.addEventListener('click', calculator.resetAll.bind(calculator));
 toggleNumberSignButton === null || toggleNumberSignButton === void 0 ? void 0 : toggleNumberSignButton.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
-equalsButton === null || equalsButton === void 0 ? void 0 : equalsButton.addEventListener('click', () => calculator.operate.bind(calculator));
+equalsButton === null || equalsButton === void 0 ? void 0 : equalsButton.addEventListener('click', calculator.operate.bind(calculator));
 undoButton === null || undoButton === void 0 ? void 0 : undoButton.addEventListener('click', calculator.undo.bind(calculator));
-/**
- * 1. getNumber()
- * 2. getOperator()
- * 3. getNumber()
- * 4. getOperator()
- * 5. undo()
- * 6. undo()
- */

@@ -43,6 +43,17 @@ const toggleNumberSignButton = calculatorContainer.querySelector(
 const equalsButton = calculatorContainer.querySelector('[data-equals-button]');
 const undoButton = calculatorContainer.querySelector('[data-undo-button]');
 
+class CalculatorMemento {
+  state: IState;
+
+  constructor(state: IState) {
+    this.state = state;
+  }
+
+  getState() {
+    return this.state;
+  }
+}
 class Caretaker {
   history: CalculatorMemento[];
 
@@ -90,12 +101,9 @@ class Calculator {
   }
 
   undo() {
-    console.log('this.state u UNDO', this.state);
     const memento = this.caretaker.popPrevState();
 
     if (memento) {
-      console.log('memento.getState', memento.getState());
-
       this.state = { ...memento.getState() };
       this.generateDisplayScore();
     }
@@ -103,7 +111,6 @@ class Calculator {
 
   operate() {
     const areOperandsValid = this.areOperandsValid() && this.state.operator !== '';
-    console.log('areOperandsValid', areOperandsValid);
 
     if (!areOperandsValid) return;
 
@@ -124,8 +131,6 @@ class Calculator {
     this.generateDisplayScore(true);
     this.state.a = score.toString();
     this.state.b = '';
-
-    console.log('this.state u operate AFTER', this.state);
   }
 
   getNumber(num: string) {
@@ -214,18 +219,6 @@ class Calculator {
 
 const calculator = new Calculator();
 
-class CalculatorMemento {
-  state: IState;
-
-  constructor(state: IState) {
-    this.state = state;
-  }
-
-  getState() {
-    return this.state;
-  }
-}
-
 numberButtons.forEach((btn) => {
   btn.addEventListener('click', (e) => {
     const element = e.target as HTMLElement;
@@ -257,14 +250,5 @@ operationButtons.forEach((btn) => {
 decimalButton.addEventListener('click', calculator.addDecimal.bind(calculator));
 resetAllButton?.addEventListener('click', calculator.resetAll.bind(calculator));
 toggleNumberSignButton?.addEventListener('click', calculator.toggleNumberSign.bind(calculator));
-equalsButton?.addEventListener('click', () => calculator.operate.bind(calculator));
+equalsButton?.addEventListener('click', calculator.operate.bind(calculator));
 undoButton?.addEventListener('click', calculator.undo.bind(calculator));
-
-/**
- * 1. getNumber()
- * 2. getOperator()
- * 3. getNumber()
- * 4. getOperator()
- * 5. undo()
- * 6. undo()
- */
